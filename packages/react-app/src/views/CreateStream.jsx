@@ -18,6 +18,11 @@ const customHttpProvider = new ethers.providers.InfuraProvider("rinkeby", INFURA
 
 //where the Superfluid logic takes place
 async function createNewFlow(recipient, flowRate, provider) {
+  console.log("creating new flow");
+  console.log(recipient);
+  console.log(flowRate);
+  console.log(provider);
+
   const sf = await Framework.create({
     chainId: 4,
     provider: provider,
@@ -28,14 +33,16 @@ async function createNewFlow(recipient, flowRate, provider) {
     provider: provider,
   });
 
-  const USDCxContraactAddress = await sf.loadSuperToken("USDCx");
-  const USDCx = USDCxContraactAddress.address;
+  //const USDCxContraactAddress = await sf.loadSuperToken("USDCx");
+  //const USDCx = "0x0F1D7C55A2B133E000eA10EeC03c774e0d6796e8";
+
+  const fUSDCx = await sf.loadSuperToken("0x0F1D7C55A2B133E000eA10EeC03c774e0d6796e8");
 
   try {
     const createFlowOperation = sf.cfaV1.createFlow({
       flowRate: flowRate,
       receiver: recipient,
-      superToken: USDCX,
+      superToken: fUSDCx.address,
       gasLimit: 1000000000000,
     });
 
@@ -112,7 +119,7 @@ export default function CreateStream({ price, address, readContracts, mainnetPro
                   <AddressInput ensProvider={mainnetProvider} value={toAddress} onChange={setToAddress} />
                   <h5>With this flow rate:</h5>
                   <InputGroup size="sm" className="mb-3">
-                    <InputGroup.Text id="inputGroup-sizing-sm">Small</InputGroup.Text>
+                    <InputGroup.Text id="inputGroup-sizing-sm">Rate</InputGroup.Text>
                     <Form.Control
                       aria-label="Small"
                       aria-describedby="inputGroup-sizing-sm"
@@ -126,6 +133,8 @@ export default function CreateStream({ price, address, readContracts, mainnetPro
                     <b>${flowRateDisplay !== " " ? flowRateDisplay : 0}</b> USDCx/month
                   </p>
                 </div>
+                <p> Lev Aave link recived</p>
+                <p>$0 rcived so far</p>
                 <Card.Text className="d-flex justify-content-evenly">
                   <div>
                     <Button variant="primary" onClick={() => createNewFlow(toAddress, flowRate, customHttpProvider)}>
