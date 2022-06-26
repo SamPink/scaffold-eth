@@ -28,14 +28,14 @@ async function createNewFlow(recipient, flowRate, provider) {
     provider: provider,
   });
 
-  const ETHxContraactAddress = await sf.loadSuperToken("ETHx");
-  const ETHx = ETHxContraactAddress.address;
+  const USDCxContraactAddress = await sf.loadSuperToken("USDCx");
+  const USDCx = USDCxContraactAddress.address;
 
   try {
     const createFlowOperation = sf.cfaV1.createFlow({
       flowRate: flowRate,
       receiver: recipient,
-      superToken: ETHx,
+      superToken: USDCX,
       gasLimit: 1000000000000,
     });
 
@@ -48,7 +48,7 @@ async function createNewFlow(recipient, flowRate, provider) {
       `Congrats - you've just created a money stream!
     View Your Stream At: https://app.superfluid.finance/dashboard/${recipient}
     Network: Goerli
-    Super Token: DAIx
+    Super Token: USDCx
     Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
     Receiver: ${recipient},
     FlowRate: ${flowRate}
@@ -123,7 +123,7 @@ export default function CreateStream({ price, address, readContracts, mainnetPro
                   </InputGroup>
                   <p>Your flow will be equal to:</p>
                   <p>
-                    <b>${flowRateDisplay !== " " ? flowRateDisplay : 0}</b> ETHx/month
+                    <b>${flowRateDisplay !== " " ? flowRateDisplay : 0}</b> USDCx/month
                   </p>
                 </div>
                 <Card.Text className="d-flex justify-content-evenly">
