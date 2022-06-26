@@ -29,40 +29,19 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, ExampleUI, Hints, Subgraph, Test } from "./views";
+import { Home, ExampleUI, Hints, Subgraph, CreateStream, ExistingStreams } from "./views";
 import { useStaticJsonRPC } from "./hooks";
-
-//const { ethers } = require("ethers");
 
 import { Framework } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
 
-/*
-    Welcome to 🏗 scaffold-eth !
-
-    Code:
-    https://github.com/scaffold-eth/scaffold-eth
-
-    Support:
-    https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA
-    or DM @austingriffith on twitter or telegram
-
-    You should get your own Alchemy.com & Infura.io ID and put it in `constants.js`
-    (this is your connection to the main Ethereum network for ENS etc.)
-
-
-    🌏 EXTERNAL CONTRACTS:
-    You can also bring in contract artifacts in `constants.js`
-    (and then use the `useExternalContractLoader()` hook!)
-*/
-
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 const NETWORKCHECK = true;
-const USE_BURNER_WALLET = true; // toggle burner wallet feature
+const USE_BURNER_WALLET = false; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
 
 const web3Modal = Web3ModalSetup();
@@ -74,20 +53,6 @@ const providers = [
   "https://rpc.scaffoldeth.io:48544",
 ];
 
-const main = async () => {
-  //This seems like its connected to a different provider than the one we are using in the app
-  const provider = new ethers.providers.InfuraProvider("rinkeby", INFURA_ID);
-
-  const sf = await Framework.create({
-    chainId: 42,
-    provider: provider,
-  });
-
-  if (DEBUG) console.log("Framework loaded");
-
-  return sf;
-};
-
 function App(props) {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
   // reference './constants.js' for other networks
@@ -97,6 +62,7 @@ function App(props) {
   const [address, setAddress] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[2]);
   const location = useLocation();
+
   //add sf to the global scope and state
   const [sf, setSf] = useState();
 
@@ -110,17 +76,6 @@ function App(props) {
     process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : targetNetwork.rpcUrl,
   ]);
   const mainnetProvider = useStaticJsonRPC(providers);
-
-  /*   main()
-    .then(f => {
-      console.log("1");
-      console.log(f);
-      setSf(f);
-    })
-    .catch(error => {
-      console.error("fuckkkkkkkkk");
-      console.error(error);
-    }); */
 
   if (DEBUG) console.log(`Using ${selectedNetwork} network`);
 
@@ -144,6 +99,7 @@ function App(props) {
 
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice(targetNetwork, "fast");
+
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider, USE_BURNER_WALLET);
   const userSigner = userProviderAndSigner.signer;
@@ -156,8 +112,6 @@ function App(props) {
       }
     }
     async function getSf() {
-      //add sf to the global scope and state
-      //This seems like its connected to a different provider than the one we are using in the app
       const provider = new ethers.providers.InfuraProvider("kovan", INFURA_ID);
 
       const sf = await Framework.create({
@@ -353,8 +307,11 @@ function App(props) {
         <Menu.Item key="/subgraph">
           <Link to="/subgraph">Subgraph</Link>
         </Menu.Item>
-        <Menu.Item key="/test">
-          <Link to="/test">Test</Link>
+        <Menu.Item key="/createStream">
+          <Link to="/createStream">Create Stream</Link>
+        </Menu.Item>
+        <Menu.Item key="/streams">
+          <Link to="/streams">Streams</Link>
         </Menu.Item>
       </Menu>
 
@@ -432,8 +389,24 @@ function App(props) {
             mainnetProvider={mainnetProvider}
           />
         </Route>
-        <Route path="/test">
-          <Test
+        <Route path="/createStream">
+          <CreateStream
+            address={address}
+            userSigner={userSigner}
+            mainnetProvider={mainnetProvider}
+            localProvider={localProvider}
+            yourLocalBalance={yourLocalBalance}
+            price={price}
+            tx={tx}
+            writeContracts={writeContracts}
+            readContracts={readContracts}
+            purpose={purpose}
+            sf={sf}
+            targetNetwork={targetNetwork}
+          />
+        </Route>
+        <Route path="/streams">
+          <ExistingStreams
             address={address}
             userSigner={userSigner}
             mainnetProvider={mainnetProvider}
